@@ -1,0 +1,14 @@
+services:
+  hivetech-postgres:
+    image: 'postgres:17-alpine'
+    environment:
+      - 'POSTGRES_DB=hivetech'
+      - 'POSTGRES_PASSWORD=test'
+      - 'POSTGRES_USER=user'
+    ports:
+      - '5432:5432'
+# Temp, create dockerfile
+    volumes:
+        - 'hivetech-postgres-data:/var/lib/postgresql/data'
+volumes:
+  hivetech-postgres-data:
