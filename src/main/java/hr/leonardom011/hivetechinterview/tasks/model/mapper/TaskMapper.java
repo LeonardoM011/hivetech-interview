@@ -26,4 +26,12 @@ public class TaskMapper {
         taskEntity.setDeleted(false);
         return taskEntity;
     }
+
+    public TaskEntity mapForUpdate(TaskEntity taskEntity, TaskCreateRequest taskUpdateRequest) {
+        taskEntity.setTitle(taskUpdateRequest.getTitle());
+        taskEntity.setDescription(taskUpdateRequest.getDescription());
+        taskEntity.setStatus(taskUpdateRequest.getStatus());
+        taskEntity.setPriority(taskUpdateRequest.getPriority());
+        return taskEntity;
+    }
 }
