@@ -23,9 +23,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldNameConstants
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "tasks")
+@Table(name = "tasks", indexes = {
+        @Index(name = "idx_tasks_status", columnList = "status"),
+        @Index(name = "idx_tasks_is_deleted", columnList = "is_deleted")
+})
 public class TaskEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tasks_seq")

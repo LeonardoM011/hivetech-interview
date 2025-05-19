@@ -1,8 +1,9 @@
 package hr.leonardom011.hivetechinterview.tasks.controller;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import hr.leonardom011.hivetechinterview.annotations.ApiPageable;
+import hr.leonardom011.hivetechinterview.constant.TaskStatus;
 import hr.leonardom011.hivetechinterview.tasks.model.request.TaskCreateRequest;
-import hr.leonardom011.hivetechinterview.tasks.model.request.TaskPatchRequest;
 import hr.leonardom011.hivetechinterview.tasks.model.response.TaskResponse;
 import hr.leonardom011.hivetechinterview.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @Slf4j
@@ -32,7 +36,7 @@ public class TaskController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get tasks", description = "Endpoint for getting all tasks")
     @ApiPageable
-    public ResponseEntity<Page<TaskResponse>> getTasks(@RequestParam(required = false) String status,
+    public ResponseEntity<Page<TaskResponse>> getTasks(@RequestParam(required = false) TaskStatus status,
                                                        @Parameter(hidden = true) @PageableDefault Pageable pageable) {
         log.info("GET /api/tasks started");
         Page<TaskResponse> response = taskService.getAllTasks(status, pageable);
@@ -54,8 +58,12 @@ public class TaskController {
     public ResponseEntity<TaskResponse> createTask(@RequestBody @Validated TaskCreateRequest taskCreateRequest) {
         log.info("POST /api/tasks started");
         TaskResponse response = taskService.createTask(taskCreateRequest);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{taskId}")
+                .buildAndExpand(response.getId())
+                .toUri();
         log.info("POST /api/tasks finished");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping(value = "/{taskId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,23 +72,25 @@ public class TaskController {
                                                    @RequestBody @Validated TaskCreateRequest taskUpdateRequest) {
         log.info("PUT /api/tasks/{} started", taskId);
         TaskResponse response = taskService.updateTask(taskId, taskUpdateRequest);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{taskId}")
+                .buildAndExpand(response.getId())
+                .toUri();
         log.info("PUT /api/tasks/{} finished", taskId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.created(location).body(response);
     }
 
-    @PatchMapping(value = "/{taskId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation
-    public ResponseEntity<?> patchTask(Integer taskId) {
-        return null;
-    }
-    @PatchMapping(value = "/{taskId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{taskId}", consumes = "application/json-patch+json", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Patch task", description = "Endpoint for partially updating a task by its ID")
-    public ResponseEntity<TaskResponse> patchTask(@PathVariable Long taskId,
-                                                  @RequestBody @Validated TaskPatchRequest taskPatchRequest) {
+    public ResponseEntity<TaskResponse> patchTask(@PathVariable Long taskId, @RequestBody JsonPatch jsonPatch) {
         log.info("PATCH /api/tasks/{} started", taskId);
-        TaskResponse response = taskService.patchTask(taskId, taskPatchRequest);
+        TaskResponse response = taskService.patchTask(taskId, jsonPatch);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{taskId}")
+                .buildAndExpand(response.getId())
+                .toUri();
         log.info("PATCH /api/tasks/{} finished", taskId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.created(location).body(response);
     }
 
     @DeleteMapping(value = "/{taskId}")
