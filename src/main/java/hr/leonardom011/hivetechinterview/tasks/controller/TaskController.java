@@ -8,12 +8,14 @@ import hr.leonardom011.hivetechinterview.tasks.model.response.TaskResponse;
 import hr.leonardom011.hivetechinterview.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -25,6 +27,8 @@ import java.net.URI;
 @Validated
 @CrossOrigin
 @RequestMapping("api/tasks")
+@Secured("ROLE_USER")
+@SecurityRequirement(name = "bearerAuth")
 public class TaskController {
 
     private final TaskService taskService;

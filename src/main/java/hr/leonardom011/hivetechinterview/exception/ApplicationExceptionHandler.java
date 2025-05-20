@@ -7,6 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
@@ -70,6 +71,30 @@ public class ApplicationExceptionHandler implements ProblemHandling {
                 Problem.builder()
                         .withTitle(status.getReasonPhrase())
                         .withDetail(exception.getMessage())
+                        .withStatus(Status.valueOf(status.value()))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Problem> handleNoResourceFoundException(NoResourceFoundException exception) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status).body(
+                Problem.builder()
+                        .withTitle(status.getReasonPhrase())
+                        .withDetail(exception.getMessage())
+                        .withStatus(Status.valueOf(status.value()))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Problem> handleOtherExceptions(Exception exception) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status).body(
+                Problem.builder()
+                        .withTitle(status.getReasonPhrase())
+                        .withDetail("Unknown internal server error.")
                         .withStatus(Status.valueOf(status.value()))
                         .build()
         );

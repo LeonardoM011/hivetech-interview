@@ -13,6 +13,8 @@ import hr.leonardom011.hivetechinterview.tasks.model.request.TaskCreateRequest;
 import hr.leonardom011.hivetechinterview.tasks.model.response.TaskResponse;
 import hr.leonardom011.hivetechinterview.tasks.repository.TaskRepository;
 import hr.leonardom011.hivetechinterview.tasks.service.TaskService;
+import hr.leonardom011.hivetechinterview.websocket.model.response.TaskChangedResponse;
+import hr.leonardom011.hivetechinterview.websocket.service.WebSocketEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,11 +34,13 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final ObjectMapper objectMapper;
+    private final WebSocketEventService webSocketEventService;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, ObjectMapper objectMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, ObjectMapper objectMapper, WebSocketEventService webSocketEventService) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.objectMapper = objectMapper;
+        this.webSocketEventService = webSocketEventService;
     }
 
     @Override
@@ -61,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
         TaskEntity entity = taskMapper.mapToTaskEntity(taskCreateRequest);
         TaskEntity savedEntity = taskRepository.save(entity);
         log.info("Task created successfully");
+        webSocketEventService.notifyTaskChanged(new TaskChangedResponse(savedEntity.getId()));
         return taskMapper.mapToResponse(savedEntity);
     }
 
@@ -75,6 +80,7 @@ public class TaskServiceImpl implements TaskService {
 
         TaskEntity updatedEntity = taskRepository.save(taskEntity);
         log.info("Task with ID {} updated successfully", taskId);
+        webSocketEventService.notifyTaskChanged(new TaskChangedResponse(taskId));
         return taskMapper.mapToResponse(updatedEntity);
     }
 
@@ -93,6 +99,7 @@ public class TaskServiceImpl implements TaskService {
                 patchedTask.getStatus(),
                 patchedTask.getPriority());
         log.info("Task with ID {} patched successfully", taskId);
+        webSocketEventService.notifyTaskChanged(new TaskChangedResponse(taskId));
         return taskMapper.mapToResponse(patchedTask);
     }
 
@@ -104,6 +111,7 @@ public class TaskServiceImpl implements TaskService {
         taskEntity.setDeleted(true);
         taskRepository.save(taskEntity);
         log.info("Task with ID {} marked as deleted", taskId);
+        webSocketEventService.notifyTaskChanged(new TaskChangedResponse(taskId));
     }
 
     private TaskEntity applyPatchToTask(JsonPatch jsonPatch, TaskEntity taskEntity) {

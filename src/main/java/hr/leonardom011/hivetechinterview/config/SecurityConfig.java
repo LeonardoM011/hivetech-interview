@@ -40,6 +40,8 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/docs/**").permitAll()
+                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -58,7 +60,7 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**",configuration);
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
