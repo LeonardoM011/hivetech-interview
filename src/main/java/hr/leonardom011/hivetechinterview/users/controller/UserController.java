@@ -3,6 +3,7 @@ package hr.leonardom011.hivetechinterview.users.controller;
 import hr.leonardom011.hivetechinterview.users.model.response.UserResponse;
 import hr.leonardom011.hivetechinterview.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class UserController {
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get current user", description = "Endpoint for getting the current user")
+    @SecurityRequirement(name = "bearerAuth")
     @Secured("ROLE_USER")
     public ResponseEntity<UserResponse> getCurrentUser() {
         log.info("GET /api/users/me started");

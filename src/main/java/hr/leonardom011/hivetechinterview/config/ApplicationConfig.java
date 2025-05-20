@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,6 +26,7 @@ import static hr.leonardom011.hivetechinterview.constant.SecurityConstant.JWT_AU
 @OpenAPIDefinition(info = @Info(title = "KanbanAPI", version = "1.0", description = "Kanban API documentation",
     contact = @Contact(name = "Leonardo Marinovic", email = "leonardo.leo.201@gmail.com")))
 @SecurityScheme(name = JWT_AUTH_NAME, type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
+@EnableJpaAuditing
 public class ApplicationConfig implements WebMvcConfigurer {
 
     private final UserService userService;

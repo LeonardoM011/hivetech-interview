@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -32,7 +29,7 @@ public class AuthController {
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Register a new user", description = "Endpoint for registering a new user")
-    public ResponseEntity<RegisterUserResponse> registerUser(@Valid RegisterUserRequest registerUserRequest) {
+    public ResponseEntity<RegisterUserResponse> registerUser(@RequestBody @Valid RegisterUserRequest registerUserRequest) {
         log.info("POST /api/auth/signup started");
         RegisterUserResponse response = authService.registerUser(registerUserRequest);
         log.info("POST /api/auth/signup finished");
@@ -41,7 +38,7 @@ public class AuthController {
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Login a user", description = "Endpoint for logging in a user")
-    public ResponseEntity<LoginUserResponse> loginUser(@Valid LoginUserRequest loginUserRequest) {
+    public ResponseEntity<LoginUserResponse> loginUser(@RequestBody @Valid LoginUserRequest loginUserRequest) {
         log.info("POST /api/auth/login started");
         LoginUserResponse response = authService.loginUser(loginUserRequest);
         log.info("POST /api/auth/login finished");
